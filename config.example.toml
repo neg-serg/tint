@@ -1,0 +1,64 @@
+# tint — colouriser for CLI output.
+#
+# Everything here is a delta on the builtin behaviour: token scanners (sizes,
+# percentages, addresses, paths, timestamps, severity words) already run for
+# every ruleset, and each ruleset adds only the words its own tool prints.
+# See `tint --list`, `tint --show <ruleset>` and `tint --help`.
+#
+# Colour names, #rrggbb, idx:N, on-<colour> (background), and the attributes
+# bold/dim/italic/underline are accepted; a value may also be a theme slot
+# (err, warn, ok, info, note, path, ip, hash, ...), which reuses the theme.
+
+# Follow the terminal: always | never | auto (auto = colour only on a tty, and
+# never when NO_COLOR/TERM=dumb are set).
+color = "auto"
+
+# The theme: `dark` (default — whatever ANSI palette the terminal has), `light`,
+# `vivid`, `mono` (attributes only), `none`, or `neg` (the neg.nvim palette as
+# truecolor — the one in the screenshots).
+# theme = "neg"
+
+# --- extra rules ---------------------------------------------------------
+# Words that the generic severity table does not know. `keyword.` matches on
+# word boundaries, `literal.` anywhere, `prefix.` at line start, `suffix.` at
+# line end.
+# keyword.SUCCESS = "ok"
+# keyword.FAILURE = "err"
+# Punctuation in a needle needs a quoted key (the file stays valid TOML for
+# taplo; the parser accepts the quotes).
+# "prefix.###" = "brightmagenta,bold"
+# "prefix.>>>" = "brightmagenta,bold"
+
+# --- wrappers ------------------------------------------------------------
+# Commands to put in front of `tint` in the generated shell integration, beyond
+# the builtin table: df, du, free, lsblk, ip, ss, ping, traceroute, dig/host,
+# mount/findmnt, dmesg, ps, lsof, sensors, lspci/lsusb, smartctl/nvme, uptime,
+# w, last, env, find, tar, diff, nmap, iptables/nft, systemd-analyze.
+#
+# Not wrapped on purpose: git, systemctl, journalctl, cargo, nix/nh,
+# nixos-rebuild, python, docker/podman, kubectl, curl, openssl, make. A wrapped
+# command sees a pipe instead of a terminal, which would take their pager, their
+# progress bar or their `-it` away. Those keep a ruleset and are used explicitly:
+#     journalctl -b | tint -r journalctl
+# Modes for the wrappers, one command list each:
+#
+#   pty   = "..."   give the child a terminal of its own (--pty). Progress bars,
+#                   `docker run -it` and REPLs keep working; screen-control
+#                   output is relayed untouched. Off by default: a relay bug in a
+#                   build command is worse than no colour. Try it first with
+#                       tint --pty -- cargo --version
+#   pager = "..."   page the colourised output itself (--pager, `less -FRX`).
+#                   systemctl is already on; journalctl works too, but not its
+#                   follow mode (`journalctl -f`), which a pager would swallow.
+#
+# Other tools are left alone on purpose (git, curl, docker, kubectl, make,
+# python): they own a pager, an editor or an interactive prompt. Reach them
+# explicitly with `cmd | tint -r NAME`.
+pty = ""
+pager = ""
+wrap = ""
+skip = ""
+
+# --- per-slot restyling --------------------------------------------------
+# theme.style.hdr = "bold"
+# theme.style.path = "idx:33,underline"

@@ -36,8 +36,9 @@ Three layers, cheapest first:
 
 Spans never nest: overlapping candidates are dropped after a sort, and the
 renderer walks each line once. Bulk input (a file, `nix log | tint`) is
-classified in parallel by line, bottom-up to identical bytes; a stream
-(`tail -f`, `journalctl -f`, `ping`) is forwarded line by line as it arrives.
+classified in parallel and written in input order, so the output is
+byte-identical to the sequential render; a stream (`tail -f`,
+`journalctl -f`, `ping`) is forwarded line by line as it arrives.
 
 Details, including the buffer/threading design and the pty relay, are in
 [docs/design.md](docs/design.md).
@@ -65,12 +66,14 @@ nix build github:neg-serg/tint          # ./result/bin/tint
 nix run github:neg-serg/tint -- --list
 ```
 
-In a NixOS or home-manager configuration, take it from the flake's overlay
-(`inputs.tint.overlays.default`) or build it straight from source:
+In a NixOS or home-manager configuration, add the flake input and take the
+package from it (the lock pins the revision):
 
 ```nix
+inputs.tint.url = "github:neg-serg/tint";   # flake.nix
+
 environment.systemPackages = [
-  (pkgs.callPackage (fetchTarball "https://github.com/neg-serg/tint/archive/main.tar.gz") { })
+  inputs.tint.packages.${pkgs.stdenv.hostPlatform.system}.default
 ];
 ```
 

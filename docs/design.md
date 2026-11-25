@@ -154,4 +154,4 @@ On the 9950X3D, 2026-10-21:
 - streaming: a one-line-at-a-time stream is forwarded per read, pinned by the
   probe test (the first chunk is written before the second is read).
 
-The 58 unit tests run in the build (`cargo test`).
+The 70 unit tests run in the build (`cargo test`).

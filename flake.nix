@@ -24,7 +24,7 @@
         }
       );
 
-      overlays.default = final: prev: {
+      overlays.default = final: _prev: {
         tint = final.callPackage ./default.nix { };
       };
 
